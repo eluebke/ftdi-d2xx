@@ -23,6 +23,12 @@ Use the files from the i386 folder, if it doesn't work try the files from the x8
 
 If you need more assistance, there is a great guide over at http://xanthium.in/accessing-ft232-using-d2xx-library-and-gcc
 
+## Files
+
+The example consists of files. One just lists a few infos about all attached devices to stdout. The other one is a small project, where two pins of the device serve as input/transmitter/Tx and one as output/receiver/Rx. The device is set up, then a simple bit sequence is written to the device and then a resulting sequence is read and those two are printed to stdout.
+
+The FTDI-device I used was a FTDI FT2232-H56-Q.
+
 ## Current status
 
 As I don't have a FTDI-device handy right now the code is not tested, but it should work. I'll probably be able to test it in the middle of october (2017).
