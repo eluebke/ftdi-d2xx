@@ -1,3 +1,10 @@
+/*
+ * Two pins of the device serve as input/transmitter/Tx and one 
+ * as output/receiver/Rx. The device is set up, then a simple bit
+ * pattern is written to the device and then a resulting pattern 
+ * is read and those two are printed to stdout.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>  // for windows specific keywords in ftd2xx.h
@@ -11,7 +18,7 @@ int main() {
 
   int txPin1AsInt = 3;
   int txPin2AsInt = 4;
-  int rxPinAsInt = 3;
+  int rxPinAsInt = 6;
 
   char pinTranslator[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
@@ -20,7 +27,7 @@ int main() {
   UCHAR rxPin = pinTranslator[rxPinAsInt]; // rx = receive = output
 
   // alternative would be :
-  // UCHAR txPin1 = 1 << 3; 
+  // UCHAR txPin1 = 1 << txPin1AsInt; 
 
   int lengthTestPattern = 8;
   
