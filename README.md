@@ -19,13 +19,13 @@ Put the C-files into a folder together with the ftd2xx.h and ftd2xx.lib from the
 "gcc -o ftdiexample ftdi-d2xx.c ftd2xx.lib"
 and it should compile.
 
-Use the files from the i386 folder, if it doesn't work try the files from the x86 folder.
+Use the files from the i386 folder of the driver, if it doesn't work try the files from the x86 folder.
 
 If you need more assistance, there is a great guide over at http://xanthium.in/accessing-ft232-using-d2xx-library-and-gcc
 
 ## Examples
 
-The example consists of files. 
+The example consists of two files. 
 
 One just lists a few infos about all attached devices to stdout. 
 
@@ -37,7 +37,7 @@ The FTDI-device I used was a FTDI FT2232-H56-Q.
 
 ## Current status
 
-As I don't have a FTDI-device handy right now the code is not tested, but it should work. I'll probably be able to test it in the middle of october (2017).
+The code is tested and should work out of the box.
 
 I know it is bad practice to just do everything sequentially in the main function but I frankensteined that code out of a larger project and putting it all in pretty, nice functions would have taken too much time. Maybe I'll do that later, maybe not. ;-)
 
