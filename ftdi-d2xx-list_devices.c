@@ -1,4 +1,13 @@
-  // Print details for all connected devices
+// Print details for all connected devices
+
+#include <stdio.h>
+#include <windows.h>  // for windows specific keywords in ftd2xx.h
+#include "ftd2xx.h"   // Header file for ftd2xx.lib 
+
+// main programm
+
+int main() {
+
   FT_STATUS ftStatus; 
   DWORD numDevs;
 
@@ -20,9 +29,9 @@
 
     if(ftStatus != FT_OK) { 
       // FT_Open failed 
-      printf("Failed to open device.\n");
+      printf("Failed to open device %i.\n", idx);
       return 0; 
-      } 
+    } 
 
     ftStatus = FT_GetDeviceInfo(ftHandleForListDetails, 
       &ftDeviceForListDetails, &deviceID, SerialNumber, 
@@ -41,3 +50,7 @@
     FT_Close(ftHandleForListDetails);
 
   }
+
+  return 0;
+
+}
