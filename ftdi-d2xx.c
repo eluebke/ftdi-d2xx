@@ -1,8 +1,8 @@
 /*
  * Two pins of the device serve as input/transmitter/Tx and one 
  * as output/receiver/Rx. The device is set up, then a simple bit
- * pattern is written to the device and then a resulting pattern 
- * is read and those two are printed to stdout.
+ * pattern is written to the device and the resulting pattern 
+ * read and those two are printed to stdout.
  */
 
 #include <stdio.h>
@@ -10,15 +10,21 @@
 #include <windows.h>  // for windows specific keywords in ftd2xx.h
 #include "ftd2xx.h"   // Header file for ftd2xx.lib 
 
-// Main programm
+// main programm
 
 int main() {
 
   // setup up variables
 
   int txPin1AsInt = 3;
-  int txPin2AsInt = 4;
-  int rxPinAsInt = 6;
+  int txPin2AsInt = 6;
+  int rxPinAsInt = 7;
+
+  int deviceToTest = 0;
+  int baudrate = 96000;
+
+  // convert pin ints into pin chars and set up some data structures
+  // to hold input and output
 
   char pinTranslator[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
@@ -31,7 +37,7 @@ int main() {
 
   int lengthTestPattern = 8;
   
-  int testPattern[8]= {1, 1, 0, 0, 1, 1, 0, 0};
+  int testPattern[8] = {1, 1, 0, 0, 1, 1, 0, 0};
 
   char txPinAssignment[lengthTestPattern];
   memset(txPinAssignment, 0, sizeof(txPinAssignment));
@@ -39,34 +45,36 @@ int main() {
   // the resulting pattern and rxPinAssignment have to be a 
   // little bit larger than the test pattern and txPinAssignment
   // due to the delay devices that are attached to the pins may cause
-  // the answer will then be visible on the Rx/output only after a short delay
+  // the answer will then be visible on the Rx/output only after a little while
 
   int lengthResultPattern = lengthTestPattern * 2;
 
-  int resultPattern[16]= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  int resultPattern[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   char rxPinAssignment[lengthResultPattern];
   memset(rxPinAssignment, 0, sizeof(rxPinAssignment));
 
   // generate input/Tx pin Assignment
+  // transform the input test pattern into the input pin assignment
+  // this step is essentially transforming it from human readable/editable to 
+  // machine readable/executable
 
   for (int position = 0; position < lengthTestPattern; position++) {
 
     // Start with all 0s
     char currentPinAssignment = 0x00;
 
-    if (testPattern[position] == 1) currentPinAssignment = currentPinAssignment|txPin1;
-
-    if (testPattern[position] == 0) currentPinAssignment = currentPinAssignment|txPin2;
+    // if the test pattern is 1 at the position
+    // set the txPins to 1/High in the input pin assignment
+    if (testPattern[position] == 1) {
+    	currentPinAssignment = currentPinAssignment|txPin1;
+    	currentPinAssignment = currentPinAssignment|txPin2;
+	}
 
     txPinAssignment[position] = currentPinAssignment;
-
   }
 
   // Setting communication mode and choosing pins
-
-  int deviceToTest = 0;
-  int baudrate = 96000;
 
   FT_HANDLE ftHandle;
   FT_STATUS ftStatus;
@@ -75,7 +83,7 @@ int main() {
   ftStatus = FT_Open(deviceToTest, &ftHandle);
 
   if(ftStatus != FT_OK) { 
-    // FT_Open failed 
+    printf("Failed to open device.\n");
     return 0; 
   } 
 
@@ -90,7 +98,7 @@ int main() {
   
   if (ftStatus == FT_OK) { 
     // 0xff written to device 
-    printf("Setting Bitmask successfull.\n");
+    printf("Setting Bitmask successful.\n");
   } else { 
     // FT_SetBitMode FAILED! 
     printf("Setting Bitmask failed.\n");
@@ -120,8 +128,7 @@ int main() {
 
   if (ftStatus == FT_OK) { 
     // FT_Write OK 
-    printf("Write successfull.\n");
-    printf("TxBytes: %d\n", TxBytes);
+    printf("Write successful.\n");
     // printf("Buffer: %s\n", TxBuffer);
   } else { 
     // FT_Write Failed 
@@ -145,7 +152,7 @@ int main() {
   ftStatus = FT_Read(ftHandle, rxPinAssignment, RxBytes, &BytesReceived); 
 
   if (ftStatus == FT_OK) {
-
+  	printf("Read successful.\n");
     printf("TxBytes: %d\n", TxBytes);
     printf("RxBytes: %d\n", RxBytes);
     printf("Bytes received: %d\n", BytesReceived);
@@ -156,17 +163,18 @@ int main() {
   FT_Close(ftHandle);
 
   // evaluate received pin assignment and generate the result pattern
+  // this step transforms back from the machine generated output into 
+  // a human readable format
 
   for (int position = 0; position < lengthResultPattern; position++) {
 
-    // Start with all 0s
     char currentPinAssignment = rxPinAssignment[position];
 
     // Logical AND the bit sequence of the result and the rxPin
     int result = (int) currentPinAssignment & rxPin;
 
     // shift the result to the left so that it ends up as 0 or 1
-    rxPinAssignment[position] = result >> rxPinAsInt;
+    resultPattern[position] = result >> rxPinAsInt;
 
   }
 
@@ -179,7 +187,7 @@ int main() {
   printf("\n");
 
   printf("Received Pattern: ");
-  for (int tidx = 0; tidx < lengthTestPattern; tidx++) {
+  for (int tidx = 0; tidx < lengthResultPattern; tidx++) {
     printf("%i, ", resultPattern[tidx]);
   }
   printf("\n");
